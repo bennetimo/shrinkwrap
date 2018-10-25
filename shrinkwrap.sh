@@ -190,7 +190,7 @@ while getopts c:i:f:p:abdgh opt ; do
 			;;
     f)
 			PIX_FMT="${OPTARG}"
-			log "pxl_fmt set to $PXL_FMT"
+			log "pxl_fmt set to $PIX_FMT"
 			;;
     g)
       GOPRO_TRANSCODING=true
