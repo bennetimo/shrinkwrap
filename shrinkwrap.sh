@@ -42,12 +42,13 @@ BACKUP_METADATA=false # If set, dumps a text file with all the metadata of the i
 GOPRO_TRANSCODING=false
 GOPRO_TRANSCODING_HERO4=false
 AUDIO_MODE=false
+AUDIO_AND_VIDEO_MODE=false
 DRONE_MODE=false
 
 FFMPEG_OPTIONS_GOPRO_MAP='-map 0:v -map 0:a -map 0:m:handler_name:"	GoPro TCD" -map 0:m:handler_name:"	GoPro MET" -map 0:m:handler_name:"	GoPro SOS" -tag:d:1 "gpmd" -tag:d:2 "gpmd"'
 FFMPEG_GOPRO_STD_METADATA='-metadata:s:v handler="	GoPro AVC" -metadata:s:a handler="	GoPro AAC" '
 FFMPEG_OPTIONS_GOPRO_METADATA="${FFMPEG_GOPRO_STD_METADATA}"' -metadata:s:d:0 handler="	GoPro TCD" -metadata:s:d:1 handler="	GoPro MET" -metadata:s:d:2 handler="	GoPro SOS (original fdsc stream)"'
-FFMPEG_OPTIONS_AUDIO="-c:a libfdk_aac -vbr 4"
+FFMPEG_OPTIONS_AUDIO="-codec:a libfdk_aac -vbr 4"
 
 usage() { echo "Usage: shrinkwrap [-c :crf -i :inputextension -b -g -g] <file>" 1>&2;ffmpeg exit 0; }
 
@@ -63,9 +64,13 @@ shrink_video () {
   # -c copy => for all streams, default to just copying as it with no transcoding
   # -codec:v libx264 -pix_fmt $PIX_FMT -crf $CRF_FACTOR => specifically for the video stream, reencode using x264 and the specified pix_fmt and crf factor
   FFMPEG_OPTIONS_COMMON="-copy_unknown -map_metadata 0 -c copy -codec:v libx264 -crf $CRF_FACTOR -preset $PRESET"
+
+  # Check if we should transcode the audio in the video too
+  if [ "$AUDIO_AND_VIDEO_MODE" = true ] ; then FFMPEG_OPTIONS_COMMON="$FFMPEG_OPTIONS_COMMON $FFMPEG_OPTIONS_AUDIO"; fi
+
   FFMPEG_OPTIONS_STANDARD="-map 0 -pix_fmt $PIX_FMT"
 
-  if [ "$GOPRO_TRANSCODING" = true && "$GOPRO_TRANSCODING_HERO4" = false ] ; then
+  if [ "$GOPRO_TRANSCODING" = true ] && [ "$GOPRO_TRANSCODING_HERO4" = false ] ; then
     local cmd_ffmpeg="ffmpeg -noautorotate -i \"$input_filename\" $FFMPEG_OPTIONS_COMMON -pix_fmt yuvj420p $FFMPEG_OPTIONS_GOPRO_MAP $FFMPEG_OPTIONS_GOPRO_METADATA \"$output_filename\""
   else
 		if [ "$GOPRO_TRANSCODING_HERO4" = true ] ; then
@@ -159,13 +164,17 @@ shrinkwrap () {
   fi
 }
 
-while getopts c:i:f:p:abdgh opt ; do
+while getopts c:i:f:p:aAbdgh opt ; do
   case $opt in
 		a)
 			INPUT_EXTENSION="m4a"
 			OUTPUT_EXTENSION="m4a"
 			AUDIO_MODE=true
 			log "running in audio mode: ON (input/output extension set to .m4a)"
+			;;
+    A)
+			AUDIO_AND_VIDEO_MODE=true
+			log "transcoding video audio: ON"
 			;;
 		b)
       BACKUP_METADATA=true
