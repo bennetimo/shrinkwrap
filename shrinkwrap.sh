@@ -8,6 +8,7 @@ INPUT_EXTENSION="mp4"
 OUTPUT_EXTENSION="mp4"
 PRESET="medium"
 PIX_FMT="yuv420p"
+FFMPEG_EXTRA=""
 
 # Keep track of how much we've processed
 count=0
@@ -63,7 +64,7 @@ shrink_video () {
   # -map 0 => copy *all* streams found in the file, not just the best audio and video as is the default (e.g. including data)
   # -c copy => for all streams, default to just copying as it with no transcoding
   # -codec:v libx264 -pix_fmt $PIX_FMT -crf $CRF_FACTOR => specifically for the video stream, reencode using x264 and the specified pix_fmt and crf factor
-  FFMPEG_OPTIONS_COMMON="-copy_unknown -map_metadata 0 -c copy -codec:v libx264 -crf $CRF_FACTOR -preset $PRESET"
+  FFMPEG_OPTIONS_COMMON="-copy_unknown -map_metadata 0 -c copy -codec:v libx264 -crf $CRF_FACTOR -preset $PRESET $FFMPEG_EXTRA"
 
   # Check if we should transcode the audio in the video too
   if [ "$AUDIO_AND_VIDEO_MODE" = true ] ; then FFMPEG_OPTIONS_COMMON="$FFMPEG_OPTIONS_COMMON $FFMPEG_OPTIONS_AUDIO"; fi
@@ -164,7 +165,7 @@ shrinkwrap () {
   fi
 }
 
-while getopts c:i:f:p:aAbdgh opt ; do
+while getopts c:e:i:f:p:aAbdgh opt ; do
   case $opt in
 		a)
 			INPUT_EXTENSION="m4a"
@@ -189,6 +190,10 @@ while getopts c:i:f:p:aAbdgh opt ; do
       PIX_FMT="yuvj420p"
 			log "running in drone mode: ON"
 			;;
+    e)
+      FFMPEG_EXTRA=${OPTARG}
+      log "adding extra opts for ffmpeg: $FFMPEG_EXTRA"
+      ;;
 		h)
       GOPRO_TRANSCODING_HERO4=true
       log "gopro hero 4 transcoding: ON"

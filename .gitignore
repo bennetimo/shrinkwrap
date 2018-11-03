@@ -1,0 +1,13 @@
+# IDE files #
+######################
+.idea
+
+# Scala files #
+######################
+**/target/*
+*.class
+*.log
+
+# OS generated files #
+######################
+.DS_Store
