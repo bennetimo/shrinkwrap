@@ -42,6 +42,8 @@ object Skrinkwrap extends App {
   parser.parse(args, Config()) match {
     case Some(config) =>
       println("config is : " + config)
+
+      "ffmpeg --help" !
     // do stuff
 
     case None =>
