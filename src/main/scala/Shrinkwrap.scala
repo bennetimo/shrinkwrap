@@ -1,3 +1,5 @@
+import build.BuildInfo
+
 import scala.sys.process._
 import scala.language.postfixOps
 
@@ -14,7 +16,7 @@ case class Config (inputExtension: String = "", outputExtension: String = "",
 object Skrinkwrap extends App {
 
   val parser = new scopt.OptionParser[Config]("shrinkwrap") {
-    head("shrinkwrap", "0.1")
+    head(BuildInfo.name, BuildInfo.version)
 
     opt[String]('i', "input-extension").action((x, c) =>
       c.copy(inputExtension = x)).text("input file extension to process")

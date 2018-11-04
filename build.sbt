@@ -1,3 +1,5 @@
+name := "shrinkwrap"
+
 scalaVersion := "2.12.7"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
@@ -37,6 +39,13 @@ imageNames in docker := Seq(
   ImageName(
     namespace = Some("bennetimo"),
     repository = name.value,
-    tag = Some("v" + version.value)
+    tag = Some(version.value)
   )
+)
+
+lazy val root = (project in file(".")).
+  enablePlugins(BuildInfoPlugin).
+  settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "build"
 )
