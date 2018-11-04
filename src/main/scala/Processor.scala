@@ -1,40 +1,47 @@
 import java.io.File
 
+import com.typesafe.scalalogging.Logger
+
 class Processor(config: Config) {
 
-  val stats = new Stats()
+  val logger = Logger("shrinkwrap")
+  logger.debug(s"Config is: $config")
+
+  private var totalFiles = 0
+  private var filesProcessed = 0
+  private var filesSkipped = 0
+  private var bytesProcessed = 0l
+  private var bytesSaved = 0l
 
   def processFile(file: File): Unit = {
-    println(s"Shrinkwrapping file: ${file.getAbsolutePath}")
-    stats.filesProcessed += 1
-  }
+    val ext = fileExtension(file.getAbsolutePath)
+    val transcoded = file.getName.contains(config.transcodeSuffix)
 
-  def processDir(dir: File): Unit = {
-    println(s"Shrinkwrapping directory: ${dir.getAbsolutePath}")
-    stats.dirsProcessed += 1
+    if (ext == config.inputExtension && !transcoded) {
+      logger.debug(s"Shrinkwrapping file: ${file.getAbsolutePath}")
 
-    val files = for {
-      f <- dir.listFiles
-      ext = fileExtension(f.getAbsolutePath)
-      //transcoded = f.getName.matches(config.transcodeSuffix)
-      if ext == config.inputExtension
-    } yield f
-
-    println("Processing: " + files.mkString("\n"))
-
+      bytesProcessed += file.length()
+    } else {
+      logger.debug(s"Skipping file: ${file.getAbsolutePath}")
+      filesSkipped += 1
+    }
   }
 
   def processFiles(): Unit = {
-    val (d, f) = config.files.filter(_.exists()).partition(_.isDirectory)
+    val (dirs, files) = config.files.filter(_.exists()).partition(_.isDirectory)
+    val allFiles = dirs.flatMap(_.listFiles) ++ files
 
-    f.foreach(processFile)
-    d.foreach(processDir)
+    totalFiles = allFiles.length
+
+    logger.debug(s"Directories scanned: ${dirs.length}")
+    logger.debug(s"Total files to inspect: ${allFiles.length}")
+
+    allFiles.foreach(processFile)
+
+    logger.debug(s"Total bytes processed: $bytesProcessed bytes")
+    logger.debug(s"Total mb processed: ${bytesProcessed >> 20}mb")
   }
 
-  def fileExtension(filePath: String) = filePath.substring(filePath.lastIndexOf(".") + 1)
-
+  private def fileExtension(filePath: String) =
+    filePath.substring(filePath.lastIndexOf(".") + 1)
 }
-
-case class Stats(var filesProcessed: Int = 0, filesSkipped: Int = 0,
-                 var dirsProcessed: Int = 0, dirsSkipped: Int = 0,
-                 bytesSaved: Int = 0)

@@ -1,15 +1,15 @@
 import java.io.File
 
-case class Config (inputExtension: String = "", outputExtension: String = "mp4",
-                   transcodeAudio: Boolean = true,
-                   transcodeVideo: Boolean = true,
-                   crf: Int = 23,
-                   pixFmt: String = "yuv420p",
-                   ffmpegPreset: String = "medium",
-                   backupMetadata: Boolean = false,
-                   transcodeSuffix: String = "-tc",
-                   files: Seq[File] = Nil
-                  ){
+case class Config(inputExtension: String = "",
+                  outputExtension: String = "mp4",
+                  transcodeAudio: Boolean = true,
+                  transcodeVideo: Boolean = true,
+                  crf: Int = 23,
+                  pixFmt: String = "yuv420p",
+                  ffmpegPreset: String = "medium",
+                  backupMetadata: Boolean = false,
+                  transcodeSuffix: String = "-tc",
+                  files: Seq[File] = Nil) {
 
   override def toString: String = {
     val sb: StringBuilder = new StringBuilder()

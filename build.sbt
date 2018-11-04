@@ -6,7 +6,13 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.7.0"
 
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
+
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
+
 enablePlugins(DockerPlugin)
+
+scalafmtOnCompile := true
 
 dockerfile in docker := {
   val artifact: File = assembly.value
