@@ -22,13 +22,6 @@ dockerfile in docker := {
       .entryPoint("java", "-jar", artifactTargetPath)
   }
 
-//  val stagedDockerfile =  sbtdocker.staging.DefaultDockerfileProcessor(dockerFile, dockerDir)
-//  IO.write(dockerDir / "Dockerfile",stagedDockerfile.instructionsString)
-//  stagedDockerfile.stageFiles.foreach {
-//    case (source, destination) =>
-//      source.stage(destination)
-//  }
-  
   dockerFile
 }
 
