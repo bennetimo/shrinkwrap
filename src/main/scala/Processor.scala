@@ -1,6 +1,23 @@
 import java.io.File
 
 import com.typesafe.scalalogging.Logger
+import sys.process._
+import scala.language.postfixOps
+
+case class ShrinkWrapFile(file: File) {
+  val path = file.getAbsolutePath
+  def transcoded(transcodeSuffix: String, outputExtension: String): Boolean = {
+    //File is transcoded if it has the suffix in it's name (it is the transcode), or
+    //if the transcoded version of it exists as a file in the same directory.
+    file.getName.contains(transcodeSuffix) ||
+    new File(transcodePath(transcodeSuffix, outputExtension)).exists()
+  }
+  def ext: String = fileExtension(file.getAbsolutePath)
+  def transcodePath(transcodeSuffix: String, outputExtension: String): String =
+    s"${path.take(path.lastIndexOf("."))}${transcodeSuffix}.${outputExtension}"
+  private def fileExtension(filePath: String) =
+    filePath.substring(filePath.lastIndexOf(".") + 1)
+}
 
 class Processor(config: Config) {
 
@@ -14,16 +31,31 @@ class Processor(config: Config) {
   private var bytesSaved = 0l
 
   def processFile(file: File): Unit = {
-    val ext = fileExtension(file.getAbsolutePath)
-    val transcoded = file.getName.contains(config.transcodeSuffix)
+    ShrinkWrapFile(file) match {
+      case sf
+          if sf.transcoded(config.transcodeSuffix, config.outputExtension) => {
+        logger.debug(
+          s"Skipping file: ${file.getAbsolutePath} (already transcoded)")
+        filesSkipped += 1
+      }
+      case sf if sf.ext != config.inputExtension => {
+        logger.debug(
+          s"Skipping file: ${file.getAbsolutePath} (ignored input extension)")
+        filesSkipped += 1
+      }
+      case sf => {
+        logger.debug(s"Shrinkwrapping file: ${file.getAbsolutePath}")
 
-    if (ext == config.inputExtension && !transcoded) {
-      logger.debug(s"Shrinkwrapping file: ${file.getAbsolutePath}")
+        bytesProcessed += file.length()
 
-      bytesProcessed += file.length()
-    } else {
-      logger.debug(s"Skipping file: ${file.getAbsolutePath}")
-      filesSkipped += 1
+        val opts = new StandardAudioVideo()
+          .optionString(config.transcodeVideo, config.transcodeAudio)
+
+        val cmd = s"ffmpeg -noautorotate -i ${file.getAbsolutePath} ${opts} ${sf
+          .transcodePath(config.transcodeSuffix, config.outputExtension)}"
+        logger.debug(s"Executing cmd: $cmd")
+        cmd !
+      }
     }
   }
 
@@ -42,6 +74,4 @@ class Processor(config: Config) {
     logger.debug(s"Total mb processed: ${bytesProcessed >> 20}mb")
   }
 
-  private def fileExtension(filePath: String) =
-    filePath.substring(filePath.lastIndexOf(".") + 1)
 }

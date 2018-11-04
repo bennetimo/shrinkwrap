@@ -19,13 +19,13 @@ dockerfile in docker := {
   val artifactTargetPath = s"/app/${artifact.name}"
 
   val dockerDir = target.value / "docker"
+  val projectDir = project.base.getAbsolutePath
 
   val dockerFile = new Dockerfile {
-    from("openjdk:11-slim")
+    from(" jrottenberg/ffmpeg:4.0")
       .maintainer("Tim Bennett")
-      .run("apt-get", "update")
-      .run("apt-get", "install", "-y", "ffmpeg", "exiftool", "jpegoptim")
-      .runRaw("apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+      .runRaw("apt-get update && apt-get install -y --no-install-recommends exiftool jpegoptim openjdk-9-jre-headless " +
+        "&& apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
       .add(artifact, artifactTargetPath)
       .entryPoint("java", "-jar", artifactTargetPath)
   }
@@ -40,7 +40,7 @@ imageNames in docker := Seq(
     repository = name.value,
     tag = Some("latest")
   ),
-  
+
   // Sets a name with a tag that contains the project version
   ImageName(
     namespace = Some("bennetimo"),
