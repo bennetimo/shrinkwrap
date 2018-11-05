@@ -48,8 +48,10 @@ class Processor(config: Config) {
 
         bytesProcessed += file.length()
 
-        val opts = new StandardAudioVideo()
-          .optionString(config.transcodeVideo, config.transcodeAudio)
+        val opts = (new StandardAudioVideo()
+          .options(config.transcodeVideo, config.transcodeAudio) ++ config.ffmpegOpts)
+          .map { case (k, v) => s"-$k $v" }
+          .mkString(" ")
 
         val cmd = s"ffmpeg -noautorotate -i ${file.getAbsolutePath} ${opts} ${sf
           .transcodePath(config.transcodeSuffix, config.outputExtension)}"

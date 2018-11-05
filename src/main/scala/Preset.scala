@@ -5,16 +5,14 @@ abstract class Preset {
   def ffmpegOptionsVideo: Map[String, String]
   def ffmpegOptionsAudio: Map[String, String]
 
-  def optionString(video: Boolean = true, audio: Boolean = true): String = {
+  def options(video: Boolean = true,
+              audio: Boolean = true): Map[String, String] = {
     val combinedMap = ffmpegOptionsBase ++
       (if (video) ffmpegOptionsVideo else Map.empty[String, String]) ++
       (if (audio) ffmpegOptionsAudio else Map.empty[String, String])
 
-    combinedMap.map { case (k, v) => s"-$k $v" }.mkString(" ")
+    combinedMap
   }
-
-  private def optionString(map: Map[String, String]): String =
-    map.map { case (k, v) => s"-$k $v" }.mkString(" ")
 }
 
 class StandardAudioVideo extends Preset {

@@ -37,6 +37,11 @@ object Shrinkwrap extends App {
       .action((x, c) => c.copy(ffmpegPreset = x))
       .text("ffmpeg preset for transcoding video")
 
+    opt[Map[String, String]]("ffmpeg-opts")
+      .valueName("k1=v1,k2=v2...")
+      .action((x, c) => c.copy(ffmpegOpts = x))
+      .text("arbitrary ffmpeg options")
+
     arg[File]("<file>...")
       .unbounded()
       .minOccurs(1)

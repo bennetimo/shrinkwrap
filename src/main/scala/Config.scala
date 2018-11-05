@@ -9,6 +9,7 @@ case class Config(inputExtension: String = "",
                   ffmpegPreset: String = "medium",
                   backupMetadata: Boolean = false,
                   transcodeSuffix: String = "-tc",
+                  ffmpegOpts: Map[String, String] = Map.empty,
                   files: Seq[File] = Nil) {
 
   override def toString: String = {
