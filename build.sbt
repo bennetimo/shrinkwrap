@@ -22,10 +22,9 @@ dockerfile in docker := {
   val projectDir = project.base.getAbsolutePath
 
   val dockerFile = new Dockerfile {
-    from(" jrottenberg/ffmpeg:4.0")
+    from(" jrottenberg/ffmpeg:4.0-alpine")
       .maintainer("Tim Bennett")
-      .runRaw("apt-get update && apt-get install -y --no-install-recommends exiftool jpegoptim openjdk-9-jre-headless " +
-        "&& apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*")
+      .runRaw("apk --update --no-cache add openjdk8-jre exiftool")
       .add(artifact, artifactTargetPath)
       .entryPoint("java", "-jar", artifactTargetPath)
   }
