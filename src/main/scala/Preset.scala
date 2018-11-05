@@ -10,7 +10,6 @@ abstract class Preset {
     val combinedMap = ffmpegOptionsBase ++
       (if (video) ffmpegOptionsVideo else Map.empty[String, String]) ++
       (if (audio) ffmpegOptionsAudio else Map.empty[String, String])
-
     combinedMap
   }
 }
@@ -27,8 +26,8 @@ class StandardAudioVideo extends Preset {
 
   def ffmpegOptionsVideo = ListMap(
     "codec:v" -> "libx264", //specifically for the video stream, reencode using x264 and the specified pix_fmt and crf factor
-    "pix_fmt" -> "yuv420p",
-    "crf" -> "23"
+    "pix_fmt" -> "yuv420p", //Default pix_fmt
+    "crf" -> "23" //Default constant rate factor for quality. 0-52 where 18 is near visually lossless
   )
 
   def ffmpegOptionsAudio = ListMap(
@@ -41,7 +40,6 @@ class StandardAudioVideo extends Preset {
 class GoProHero4 extends StandardAudioVideo {
 
   override val ffmpegOptionsVideo = super.ffmpegOptionsBase ++ ListMap(
-    "crf" -> "23",
     "medatadata:s:v:" -> "handler=\"	GoPro AVC\"",
     "medatadata:s:a:" -> "handler=\"	GoPro AAC\""
   )
@@ -51,7 +49,6 @@ class GoProHero4 extends StandardAudioVideo {
 class GoProHero5 extends StandardAudioVideo {
 
   override val ffmpegOptionsVideo = super.ffmpegOptionsBase ++ ListMap(
-    "crf" -> "23",
     "pix_fmt" -> "yuvj420p",
     "map" -> "0:v",
     "map" -> "0:a",

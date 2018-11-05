@@ -45,7 +45,7 @@ object Shrinkwrap extends App {
 
   // parser.parse returns Option[C]
   parser.parse(args, Config()) match {
-    case Some(config) => new Processor(config).processFiles
+    case Some(config) => new Processor(config).processFiles()
     case None         => // arguments are bad, error message will have been displayed
   }
 }
