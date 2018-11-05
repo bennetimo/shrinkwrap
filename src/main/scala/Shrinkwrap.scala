@@ -25,17 +25,9 @@ object Shrinkwrap extends App {
       .action((x, c) => c.copy(transcodeVideo = x))
       .text("whether to transcode video or copy unchanged")
 
-    opt[Int]('c', "crf")
-      .action((x, c) => c.copy(crf = x))
-      .text("ffmpeg crf quality value for transcoding video")
-
-    opt[String]('f', "pixfmt")
-      .action((x, c) => c.copy(pixFmt = x))
-      .text("ffmpeg pixfmt for transcoding video")
-
-    opt[String]('p', "preset")
-      .action((x, c) => c.copy(ffmpegPreset = x))
-      .text("ffmpeg preset for transcoding video")
+    opt[Boolean]('f', "force-overwrite")
+      .action((x, c) => c.copy(overwriteExistingTranscodes = x))
+      .text("whether to overwrite existing transcodes")
 
     opt[Map[String, String]]("ffmpeg-opts")
       .valueName("k1=v1,k2=v2...")

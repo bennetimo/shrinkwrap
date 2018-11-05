@@ -33,7 +33,7 @@ class Processor(config: Config) {
   def processFile(file: File): Unit = {
     ShrinkWrapFile(file) match {
       case sf
-          if sf.transcoded(config.transcodeSuffix, config.outputExtension) => {
+          if sf.transcoded(config.transcodeSuffix, config.outputExtension) && !config.overwriteExistingTranscodes => {
         logger.debug(
           s"Skipping file: ${file.getAbsolutePath} (already transcoded)")
         filesSkipped += 1
@@ -59,8 +59,9 @@ class Processor(config: Config) {
       .map { case (k, v) => s"-$k $v" }
       .mkString(" ")
 
-    val cmd = s"ffmpeg -noautorotate -i ${sf.file.getAbsolutePath} ${opts} ${sf
-      .transcodePath(config.transcodeSuffix, config.outputExtension)}"
+    val cmd =
+      s"ffmpeg -y -noautorotate -i ${sf.file.getAbsolutePath} ${opts} ${sf
+        .transcodePath(config.transcodeSuffix, config.outputExtension)}"
 
     logger.debug(s"Executing cmd: $cmd")
     cmd !
