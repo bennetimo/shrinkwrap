@@ -23,6 +23,8 @@ case class Config(inputExtension: String = "",
     sb.append(s"FFmpeg Preset: $ffmpegPreset\n")
     sb.append(s"Backup Metadata: $backupMetadata\n")
     sb.append(s"Transcoded Files Suffix: $transcodeSuffix\n")
+    sb.append(
+      s"FFMpeg Additional Options: ${ffmpegOpts.map { case (k, v) => s"-$k $v" }.mkString(" ")}\n")
     sb.append(s"Input: ${files.mkString(",")}\n")
     sb.mkString
   }

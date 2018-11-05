@@ -47,18 +47,34 @@ class Processor(config: Config) {
         logger.debug(s"Shrinkwrapping file: ${file.getAbsolutePath}")
 
         bytesProcessed += file.length()
-
-        val opts = (new StandardAudioVideo()
-          .options(config.transcodeVideo, config.transcodeAudio) ++ config.ffmpegOpts)
-          .map { case (k, v) => s"-$k $v" }
-          .mkString(" ")
-
-        val cmd = s"ffmpeg -noautorotate -i ${file.getAbsolutePath} ${opts} ${sf
-          .transcodePath(config.transcodeSuffix, config.outputExtension)}"
-        logger.debug(s"Executing cmd: $cmd")
-        cmd !
+        runFFmpeg(sf)
+        runExiftool(sf)
       }
     }
+  }
+
+  def runFFmpeg(sf: ShrinkWrapFile): Unit = {
+    val opts = (new StandardAudioVideo()
+      .options(config.transcodeVideo, config.transcodeAudio) ++ config.ffmpegOpts)
+      .map { case (k, v) => s"-$k $v" }
+      .mkString(" ")
+
+    val cmd = s"ffmpeg -noautorotate -i ${sf.file.getAbsolutePath} ${opts} ${sf
+      .transcodePath(config.transcodeSuffix, config.outputExtension)}"
+
+    logger.debug(s"Executing cmd: $cmd")
+    cmd !
+  }
+
+  def runExiftool(sf: ShrinkWrapFile): Unit = {
+    val cmd =
+      s"""exiftool -tagsfromfile ${sf.file.getAbsolutePath} -extractEmbedded -all:all
+      -"*gps*" -time:all --FileAccessDate --FileInodeChangeDate -FileModifyDate
+      -ext ${config.outputExtension} -overwrite_original ${sf.transcodePath(
+        config.transcodeSuffix,
+        config.outputExtension)}"""
+    logger.debug(s"Executing cmd: $cmd")
+    cmd !
   }
 
   def processFiles(): Unit = {
