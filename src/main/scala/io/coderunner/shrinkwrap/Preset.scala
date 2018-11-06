@@ -65,6 +65,20 @@ class GoProHero4 extends StandardAudioVideo {
 
 class GoProHero5() extends StandardAudioVideo {
 
+//  If we're converting video from a GoPro5, do extra to preserve the metadata (gps and sensor data) track
+//    GoPro software (e.g. Quik) looks for the the go pro handler names, if not present it will not see the video as it
+//    thinks it is from a non-gopro camera. By updating the handler names to what it is expecting, we can trick it into
+//  recognising the videos to be GoPro content and editable in Quik. To enable the gauges (gps, sensor data) Quik is even
+//    more picky, and must find the 'gpmd' data track inside the video, with a handler name starting with a tab!
+//    For consistency, we map all the handler names with a tab as that seems to be what the GoPro itself spits out
+//  -tag:d:2 'gpmd' => This is effectively a hack to force ffmpeg to copy the binary 'fdsc' stream, which is present in the
+//  original go pro files. Not sure exactly what it is for, but would rather keep it just in case. Unfortunately ffmpeg does Not
+//    understand this handler type, so spits out the message: '[mp4 @ 0x7fed5a80cc00] Unknown hldr_type for fdsc, writing dummy values'
+//  This effectively just adds a useless dummy stream. Using this hack we instead get the original stream copied, by telling it the
+//    the handler_type it should use is actually 'gpmd'. Since we're just copying it as is and not manipulating it this should be fine.
+//  Then to be able to distinguish it from the *real* gpmd stream, we change the handler name in the metadata to be GoPro SOS (fdsc stream)
+
+
   override def name: String = "gopro5"
 
   override def ffmpegOptionsBase = ListMap(
