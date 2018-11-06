@@ -1,8 +1,8 @@
+package io.coderunner.shrinkwrap
+
 import java.io.File
 
 import build.BuildInfo
-
-import scala.language.postfixOps
 
 object Shrinkwrap extends App {
 

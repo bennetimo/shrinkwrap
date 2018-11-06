@@ -1,8 +1,11 @@
+package io.coderunner.shrinkwrap
+
 import java.io.File
 
 import com.typesafe.scalalogging.Logger
-import sys.process._
+
 import scala.language.postfixOps
+import scala.sys.process._
 
 class Processor(config: Config) {
 
@@ -19,30 +22,27 @@ class Processor(config: Config) {
   logger.debug(ascii)
   logger.debug(s"\nUsing config: \n$config")
 
-  private var totalDirs = 0
-  private var totalFiles = 0
-  private var filesProcessed = 0
+  private var totalDirs                     = 0
+  private var totalFiles                    = 0
+  private var filesProcessed                = 0
   private var filesSkippedAlreadyTranscoded = 0
-  private var filesSkippedInputExtension = 0
-  private var bytesProcessed = 0l
-  private var bytesSaved = 0l
+  private var filesSkippedInputExtension    = 0
+  private var bytesProcessed                = 0l
+  private var bytesSaved                    = 0l
 
   def processFile(file: File): Unit = {
     ShrinkWrapFile(file, config) match {
       case sf if sf.isTranscoded && !config.overwriteExistingTranscodes => {
-        logger.debug(
-          s"Skipping file: ${file.getAbsolutePath} (already transcoded)")
+        logger.debug(s"Skipping file: ${file.getAbsolutePath} (already transcoded)")
         filesSkippedAlreadyTranscoded += 1
       }
       case sf if sf.ext != config.inputExtension => {
-        logger.debug(
-          s"Skipping file: ${file.getAbsolutePath} (ignored input extension)")
+        logger.debug(s"Skipping file: ${file.getAbsolutePath} (ignored input extension)")
         filesSkippedInputExtension += 1
       }
       case sf => {
         filesProcessed += 1
-        logger.debug(
-          s"Shrinkwrapping file: ${file.getAbsolutePath} ($filesProcessed/$totalFiles)")
+        logger.debug(s"Shrinkwrapping file: ${file.getAbsolutePath} ($filesProcessed/$totalFiles)")
 
         bytesProcessed += file.length()
         runFFmpeg(sf)
@@ -85,12 +85,9 @@ class Processor(config: Config) {
     sb.append(s"Directories scanned: ${totalDirs}\n")
     sb.append(s"Total files scanned: ${totalFiles}\n")
     sb.append(s"Total files processed: ${filesProcessed}\n")
-    sb.append(
-      s"Files skipped (already transcoded): ${filesSkippedAlreadyTranscoded}\n")
-    sb.append(
-      s"Files skipped (not matching input extension ${config.inputExtension}): ${filesSkippedInputExtension}\n")
-    sb.append(
-      s"Files skipped total ${filesSkippedAlreadyTranscoded + filesSkippedInputExtension}\n")
+    sb.append(s"Files skipped (already transcoded): ${filesSkippedAlreadyTranscoded}\n")
+    sb.append(s"Files skipped (not matching input extension ${config.inputExtension}): ${filesSkippedInputExtension}\n")
+    sb.append(s"Files skipped total ${filesSkippedAlreadyTranscoded + filesSkippedInputExtension}\n")
     sb.append(s"Total bytes processed: $bytesProcessed bytes\n")
     sb.append(s"Total bytes saved: $bytesSaved bytes\n")
     sb.append(s"Total mb processed: ${bytesProcessed >> 20}mb\n")
@@ -101,7 +98,7 @@ class Processor(config: Config) {
 
   def processFiles(): Unit = {
     val (dirs, files) = config.files.filter(_.exists()).partition(_.isDirectory)
-    val allFiles = dirs.flatMap(_.listFiles) ++ files
+    val allFiles      = dirs.flatMap(_.listFiles) ++ files
 
     totalFiles = allFiles.length
     totalDirs = dirs.length

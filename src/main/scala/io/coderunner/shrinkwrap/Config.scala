@@ -1,3 +1,5 @@
+package io.coderunner.shrinkwrap
+
 import java.io.File
 
 case class Config(inputExtension: String = "",
@@ -20,9 +22,8 @@ case class Config(inputExtension: String = "",
     sb.append(s"Backup Metadata: $backupMetadata\n")
     sb.append(s"Overwrite Existing Transcodes: $overwriteExistingTranscodes\n")
     sb.append(s"Transcoded Files Suffix: $transcodeSuffix\n")
-    sb.append(s"Using Preset: ${preset.name}\n")
-    sb.append(
-      s"FFMpeg Additional Options: ${ffmpegOpts.map { case (k, v) => s"-$k $v" }.mkString(" ")}\n")
+    sb.append(s"Using Shrinkwrap Preset: ${preset.name}\n")
+    sb.append(s"FFMpeg Additional Options: ${ffmpegOpts.map { case (k, v) => s"-$k $v" }.mkString(" ")}\n")
     sb.append(s"Input: ${files.mkString(",")}\n")
     sb.mkString
   }

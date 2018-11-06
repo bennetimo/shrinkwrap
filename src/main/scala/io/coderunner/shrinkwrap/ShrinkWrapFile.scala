@@ -1,7 +1,9 @@
+package io.coderunner.shrinkwrap
+
 import java.io.File
 
 case class ShrinkWrapFile(file: File, config: Config) {
-  val path = file.getAbsolutePath
+  val path            = file.getAbsolutePath
   val transcodeSuffix = config.transcodeSuffix
   val outputExtension = config.outputExtension
 
@@ -14,7 +16,6 @@ case class ShrinkWrapFile(file: File, config: Config) {
   def ext: String = path.substring(path.lastIndexOf(".") + 1)
 
   def transcodedFile: File =
-    new File(
-      s"${path.take(path.lastIndexOf("."))}${transcodeSuffix}.${outputExtension}")
+    new File(s"${path.take(path.lastIndexOf("."))}${transcodeSuffix}.${outputExtension}")
 
 }
