@@ -4,7 +4,6 @@ import java.io.File
 
 case class ShrinkWrapFile(file: File, config: Config) {
   val path            = file.getAbsolutePath
-  val transcodeSuffix = config.transcodeSuffix
   val outputExtension = config.outputExtension
 
   /**
@@ -25,6 +24,11 @@ case class ShrinkWrapFile(file: File, config: Config) {
   }
 
   def transcodedFile: File =
-    new File(s"${path.take(path.lastIndexOf("."))}${transcodeSuffix}.${outputExtension}")
+    new File(s"${pathWithoutExtension}${config.transcodeSuffix}.${outputExtension}")
+
+  def metdataFile: File =
+    new File(s"${pathWithoutExtension}${config.metadataSuffix}.txt")
+
+  private def pathWithoutExtension: String = s"${path.take(path.lastIndexOf("."))}"
 
 }

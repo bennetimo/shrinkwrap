@@ -4,9 +4,21 @@ import java.io.File
 
 import build.BuildInfo
 
-object Shrinkwrap extends App {
+object Shrinkwrap extends App with Logging {
+
+  var actions = Seq(ShrinkAction(), RecoverFileMetadata())
+
+  val ascii =
+    """
+      |  ___ _        _      _
+      | / __| |_  _ _(_)_ _ | |____ __ ___ _ __ _ _ __
+      | \__ \ ' \| '_| | ' \| / /\ V  V / '_/ _` | '_ \
+      | |___/_||_|_| |_|_||_|_\_\ \_/\_/|_| \__,_| .__/
+      |                                          |_|
+    """.stripMargin
 
   val parser = new scopt.OptionParser[Config]("shrinkwrap") {
+
     head(BuildInfo.name, BuildInfo.version)
 
     opt[String]('i', "input-extension")
@@ -29,6 +41,13 @@ object Shrinkwrap extends App {
       .action((x, c) => c.copy(preset = x))
       .text("preset to use (standard, gopro4, gopro5)")
 
+    opt[Boolean]('b', "backup-metadata")
+      .action((x, c) => {
+        actions = BackupMetadataAction() +: actions
+        c.copy(backupMetadata = x)
+      })
+      .text("whether to backup the original file metadata to a .txt file")
+
     opt[Boolean]('f', "force-overwrite")
       .action((x, c) => c.copy(overwriteExistingTranscodes = x))
       .text("whether to overwrite existing transcodes")
@@ -49,7 +68,14 @@ object Shrinkwrap extends App {
 
   // parser.parse returns Option[C]
   parser.parse(args, Config()) match {
-    case Some(config) => new Processor(config).processFiles()
-    case None         => // arguments are bad, error message will have been displayed
+    case Some(config) => {
+      logger.debug(ascii)
+      val (stats, skips) = new Processor(config, actions).analyzeFiles()
+      logger.debug("\n" + "*" * 60 + "\n")
+      logger.debug("Shrinkwrapping complete!")
+      skips.map(s => s"Skipped file '${s.sf.path}': ${s.reason}").foreach(m => logger.debug(m))
+      logger.debug(stats.getStats())
+    }
+    case None => // arguments are bad, error message will have been displayed
   }
 }
