@@ -40,9 +40,10 @@ class Processor(config: Config) {
         filesSkippedInputExtension += 1
       }
       case sf => {
-        logger.debug(s"Shrinkwrapping file: ${file.getAbsolutePath}")
-
         filesProcessed += 1
+        logger.debug(
+          s"Shrinkwrapping file: ${file.getAbsolutePath} ($filesProcessed/$totalFiles)")
+
         bytesProcessed += file.length()
         runFFmpeg(sf)
         runExiftool(sf)
@@ -59,21 +60,21 @@ class Processor(config: Config) {
         .mkString(" ")
 
     val cmdString =
-      raw"""ffmpeg -y -noautorotate -i ${sf.file.getAbsolutePath} ${opts} ${sf.transcodedFile.getAbsolutePath}"""
+      s"""ffmpeg -y -noautorotate -i "${sf.file.getAbsolutePath}" ${opts} "${sf.transcodedFile.getAbsolutePath}""""
 
     val cmd = Seq("/bin/sh", "-c", cmdString)
-
     logger.debug(s"Executing cmd: $cmdString")
     cmd !
   }
 
   def runExiftool(sf: ShrinkWrapFile): Unit = {
     logger.debug("Recovering file metadata using the original file")
-    val cmd =
-      s"""exiftool -tagsfromfile ${sf.file.getAbsolutePath} -extractEmbedded -all:all
-      -"*gps*" -time:all --FileAccessDate --FileInodeChangeDate -FileModifyDate
-      -ext ${config.outputExtension} -overwrite_original ${sf.transcodedFile.getAbsolutePath}"""
-    logger.debug(s"Executing cmd: $cmd")
+    val cmdString =
+      raw"""exiftool -tagsfromfile "${sf.file.getAbsolutePath}" -extractEmbedded -all:all \
+       -"*gps*" -time:all --FileAccessDate --FileInodeChangeDate -FileModifyDate \
+       -ext ${config.outputExtension} -overwrite_original "${sf.transcodedFile.getAbsolutePath}""""
+    val cmd = Seq("/bin/sh", "-c", cmdString)
+    logger.debug(s"Executing cmd: $cmdString")
     cmd !
   }
 
