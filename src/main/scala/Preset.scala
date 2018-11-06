@@ -1,6 +1,19 @@
 import scala.collection.immutable.ListMap
 
-abstract class Preset {
+object Preset {
+  implicit val presetRead: scopt.Read[Preset] =
+    scopt.Read.reads(apply _)
+
+  def apply(value: String): Preset = value match {
+    case "standard" => new StandardAudioVideo()
+    case "gopro4"   => new GoProHero4()
+    case "gopro5"   => new GoProHero5()
+    case _          => new StandardAudioVideo()
+  }
+}
+
+sealed abstract class Preset() {
+  def name: String
   def ffmpegOptionsBase: Map[String, String]
   def ffmpegOptionsVideo: Map[String, String]
   def ffmpegOptionsAudio: Map[String, String]
@@ -15,6 +28,8 @@ abstract class Preset {
 }
 
 class StandardAudioVideo extends Preset {
+
+  override def name: String = "standard"
 
   def ffmpegOptionsBase = ListMap(
     "copy_unknown" -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
@@ -34,30 +49,43 @@ class StandardAudioVideo extends Preset {
     "codec:a" -> "libfdk_aac",
     "vbr" -> "4"
   )
-
 }
 
 class GoProHero4 extends StandardAudioVideo {
 
-  override val ffmpegOptionsVideo = super.ffmpegOptionsBase ++ ListMap(
-    "medatadata:s:v:" -> "handler=\"	GoPro AVC\"",
-    "medatadata:s:a:" -> "handler=\"	GoPro AAC\""
+  override def name: String = "gopro4"
+
+  override val ffmpegOptionsVideo = super.ffmpegOptionsVideo ++ ListMap(
+    "metadata:s:v:" -> "handler='\tGoPro AVC'",
+    "metadata:s:a:" -> "handler='\tGoPro AAC'"
   )
 
 }
 
-class GoProHero5 extends StandardAudioVideo {
+class GoProHero5() extends StandardAudioVideo {
 
-  override val ffmpegOptionsVideo = super.ffmpegOptionsBase ++ ListMap(
+  override def name: String = "gopro5"
+
+  override def ffmpegOptionsBase = ListMap(
+    "copy_unknown" -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
+    "map_metadata" -> "0", //copy over the global metadata from the first (only) input
+    "codec" -> "copy", //for all streams, default to just copying as it with no transcoding
+    "preset" -> "medium"
+  )
+
+  override val ffmpegOptionsVideo = super.ffmpegOptionsVideo ++ ListMap(
     "pix_fmt" -> "yuvj420p",
-    "map" -> "0:v",
-    "map" -> "0:a",
-    "map" -> "0:m:handler_name:\"	GoPro TCD\"",
-    "map" -> "0:m:handler_name:\"	GoPro MET\"",
-    "map" -> "0:m:handler_name:\"	GoPro SOS\"",
-    "tag:d:1" -> "\"gpmd\"",
-    "tag:d:2" -> "\"gpmd\"",
-    "medatadata:s:v:" -> "handler=\"	GoPro AVC\"",
-    "medatadata:s:a:" -> "handler=\"	GoPro AAC\""
+    "map 0:v" -> "",
+    "map 0:a" -> "",
+    "map 0:m:handler_name:'\tGoPro TCD'" -> "",
+    "map 0:m:handler_name:'\tGoPro MET'" -> "",
+    "map 0:m:handler_name:'\tGoPro SOS'" -> "",
+    "tag:d:1" -> "'gpmd'",
+    "tag:d:2" -> "'gpmd'",
+    "metadata:s:v:" -> "handler='\tGoPro AVC'",
+    "metadata:s:a:" -> "handler='\tGoPro AAC'",
+    "metadata:s:d:0" -> "handler='\tGoPro TCD'",
+    "metadata:s:d:1" -> "handler='\tGoPro MET'",
+    "metadata:s:d:2" -> "handler='\tGoPro SOS (original fdsc stream)'"
   )
 }

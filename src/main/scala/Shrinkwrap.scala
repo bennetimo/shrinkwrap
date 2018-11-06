@@ -25,6 +25,10 @@ object Shrinkwrap extends App {
       .action((x, c) => c.copy(transcodeVideo = x))
       .text("whether to transcode video or copy unchanged")
 
+    opt[Preset]('p', "preset")
+      .action((x, c) => c.copy(preset = x))
+      .text("preset to use (standard, gopro4, gopro5)")
+
     opt[Boolean]('f', "force-overwrite")
       .action((x, c) => c.copy(overwriteExistingTranscodes = x))
       .text("whether to overwrite existing transcodes")

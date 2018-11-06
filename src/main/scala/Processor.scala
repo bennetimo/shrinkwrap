@@ -52,19 +52,23 @@ class Processor(config: Config) {
   }
 
   def runFFmpeg(sf: ShrinkWrapFile): Unit = {
-    val opts = (new StandardAudioVideo()
-      .options(config.transcodeVideo, config.transcodeAudio) ++ config.ffmpegOpts)
-      .map { case (k, v) => s"-$k $v" }
-      .mkString(" ")
+    val opts =
+      (config.preset.options(config.transcodeVideo, config.transcodeAudio)
+        ++ config.ffmpegOpts)
+        .map { case (k, v) => s"-$k $v" }
+        .mkString(" ")
 
-    val cmd =
-      s"ffmpeg -y -noautorotate -i ${sf.file.getAbsolutePath} ${opts} ${sf.transcodedFile.getAbsolutePath}"
+    val cmdString =
+      raw"""ffmpeg -y -noautorotate -i ${sf.file.getAbsolutePath} ${opts} ${sf.transcodedFile.getAbsolutePath}"""
 
-    logger.debug(s"Executing cmd: $cmd")
+    val cmd = Seq("/bin/sh", "-c", cmdString)
+
+    logger.debug(s"Executing cmd: $cmdString")
     cmd !
   }
 
   def runExiftool(sf: ShrinkWrapFile): Unit = {
+    logger.debug("Recovering file metadata using the original file")
     val cmd =
       s"""exiftool -tagsfromfile ${sf.file.getAbsolutePath} -extractEmbedded -all:all
       -"*gps*" -time:all --FileAccessDate --FileInodeChangeDate -FileModifyDate

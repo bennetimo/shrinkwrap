@@ -24,7 +24,7 @@ dockerfile in docker := {
   val dockerFile = new Dockerfile {
     from(" jrottenberg/ffmpeg:4.0-alpine")
       .maintainer("Tim Bennett")
-      .runRaw("apk --update --no-cache add openjdk8-jre exiftool")
+      .runRaw("apk --update --no-cache add openjdk8-jre exiftool bash")
       .add(artifact, artifactTargetPath)
       .entryPoint("java", "-jar", artifactTargetPath)
   }
