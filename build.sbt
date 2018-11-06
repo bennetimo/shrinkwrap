@@ -1,5 +1,6 @@
 import sbt.Keys.scalaVersion
 import sbtassembly.AssemblyPlugin.autoImport.assemblyJarName
+import ReleaseTransformations._
 
 ThisBuild / scalaVersion := "2.12.7"
 ThisBuild / organization := "io.coderunner"
@@ -8,11 +9,19 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
 enablePlugins(DockerPlugin)
 
+lazy val publishDocker = ReleaseStep(action = st => {
+  val extracted = Project.extract(st)
+  val ref: ProjectRef = extracted.get(thisProjectRef)
+  extracted.runAggregated(
+    sbtdocker.DockerKeys.dockerBuildAndPush in sbtdocker.DockerPlugin.autoImport.docker in ref,
+    st)
+  st
+})
+
 lazy val shrinkwrap = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "shrinkwrap",
-    version := "0.1.0",
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "build",
     scalafmtOnCompile := true,
@@ -54,5 +63,19 @@ lazy val shrinkwrap = (project in file("."))
         repository = name.value,
         tag = Some(version.value)
       )
+    ),
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,          
+      runClean,                 
+      runTest,                  
+      setReleaseVersion,        
+      commitReleaseVersion,     
+      tagRelease,               
+      //publishArtifacts,       
+      publishDocker,
+      setNextVersion,
+      commitNextVersion,        
+      pushChanges             
     )
   )
