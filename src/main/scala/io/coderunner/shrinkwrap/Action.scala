@@ -3,6 +3,7 @@ package io.coderunner.shrinkwrap
 import scala.language.postfixOps
 import scala.sys.process._
 
+// Runs an external process (ffmpeg, exiftool) and fails fast if there is a problem
 sealed trait Action extends Logging {
 
   def run(sf: ShrinkWrapFile, config: Config): Unit = {
@@ -21,6 +22,7 @@ sealed trait Action extends Logging {
 
 }
 
+// Performs transcode using ffmpeg
 case class ShrinkAction() extends Action {
   override def action(sf: ShrinkWrapFile, config: Config): String = {
     val ffmpegArgs = (config.preset.options(config.transcodeVideo, config.transcodeAudio)
@@ -31,6 +33,7 @@ case class ShrinkAction() extends Action {
   }
 }
 
+// Uses exiftool to copy file modification data from the original file to the transcode
 case class RecoverFileMetadata() extends Action {
   override def action(sf: ShrinkWrapFile, config: Config): String = {
     raw"""exiftool -tagsfromfile "${sf.file.getAbsolutePath}" -extractEmbedded -all:all \
@@ -39,6 +42,7 @@ case class RecoverFileMetadata() extends Action {
   }
 }
 
+// Uses exiftool to write a text file containing all the metadata
 case class BackupMetadataAction() extends Action {
   override def action(sf: ShrinkWrapFile, config: Config): String = {
     s"""exiftool -s -ExtractEmbedded ${sf.file.getAbsolutePath} > ${sf.metdataFile.getAbsolutePath}"""

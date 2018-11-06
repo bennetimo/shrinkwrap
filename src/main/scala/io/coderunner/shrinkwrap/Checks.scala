@@ -2,6 +2,7 @@ package io.coderunner.shrinkwrap
 
 case class Skip(reason: String, sf: ShrinkWrapFile)
 
+// Set of checks to run on each file before considering it to be transcoded
 object Checks {
 
   def checkIsTranscodedFile(sf: ShrinkWrapFile, config: Config): Either[Skip, ShrinkWrapFile] = {

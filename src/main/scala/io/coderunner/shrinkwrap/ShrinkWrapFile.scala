@@ -8,7 +8,6 @@ case class ShrinkWrapFile(file: File, config: Config) {
 
   /**
     * Whether the file is an original or transcoded file (determined by checking for the transcode suffix)
-    * @return trie of the file is an original, non transcode
     */
   def isOriginal: Boolean = !file.getName.stripSuffix("." + extension).endsWith(config.transcodeSuffix)
 

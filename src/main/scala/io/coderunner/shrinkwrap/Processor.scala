@@ -19,8 +19,10 @@ class Processor(config: Config, actions: Seq[Action]) extends Logging {
 
   def analyzeFiles(): (Stats, List[Skip]) = {
     val (dirs, files) = config.files.filter(_.exists()).partition(_.isDirectory)
-    val allFiles      = (dirs.flatMap(_.listFiles) ++ files).map(ShrinkWrapFile(_, config))
+    // Add files found in all the directories with the ones explicitly listed on the command line
+    val allFiles = (dirs.flatMap(_.listFiles) ++ files).map(ShrinkWrapFile(_, config))
 
+    // Filter the files to determine for each whether to process or skip it
     val checkedFiles = allFiles.map(sf =>
       for {
         c1 <- checkInputExtension(sf, config)

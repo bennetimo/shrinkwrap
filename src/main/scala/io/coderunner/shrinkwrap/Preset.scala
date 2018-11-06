@@ -14,6 +14,8 @@ object Preset {
   }
 }
 
+// A preset is essentially a Map of options to pass to ffmpeg, broken down into a base map, and
+// specific settings for audio and video that can be togged on and off
 sealed abstract class Preset() {
   def name: String
   def ffmpegOptionsBase: Map[String, String]
@@ -28,6 +30,7 @@ sealed abstract class Preset() {
   }
 }
 
+// Standard (default) preset converting all input to h264 video and aac audio
 class StandardAudioVideo extends Preset {
 
   override def name: String = "standard"
@@ -52,6 +55,7 @@ class StandardAudioVideo extends Preset {
   )
 }
 
+// Same as standard, but uses the correct handler names for GoPro
 class GoProHero4 extends StandardAudioVideo {
 
   override def name: String = "gopro4"
@@ -62,8 +66,6 @@ class GoProHero4 extends StandardAudioVideo {
   )
 
 }
-
-class GoProHero5() extends StandardAudioVideo {
 
 //  If we're converting video from a GoPro5, do extra to preserve the metadata (gps and sensor data) track
 //    GoPro software (e.g. Quik) looks for the the go pro handler names, if not present it will not see the video as it
@@ -77,7 +79,7 @@ class GoProHero5() extends StandardAudioVideo {
 //  This effectively just adds a useless dummy stream. Using this hack we instead get the original stream copied, by telling it the
 //    the handler_type it should use is actually 'gpmd'. Since we're just copying it as is and not manipulating it this should be fine.
 //  Then to be able to distinguish it from the *real* gpmd stream, we change the handler name in the metadata to be GoPro SOS (fdsc stream)
-
+class GoProHero5() extends StandardAudioVideo {
 
   override def name: String = "gopro5"
 
