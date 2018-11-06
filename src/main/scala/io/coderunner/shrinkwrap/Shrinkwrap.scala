@@ -52,6 +52,10 @@ object Shrinkwrap extends App with Logging {
       .action((x, c) => c.copy(overwriteExistingTranscodes = x))
       .text("whether to overwrite existing transcodes")
 
+    opt[String]('s', "transcode-suffix")
+      .action((x, c) => c.copy(transcodeSuffix = x))
+      .text("suffix used to identify a transcoded file (default '-tc')")
+
     opt[Map[String, String]]("ffmpeg-opts")
       .valueName("k1=v1,k2=v2...")
       .action((x, c) => c.copy(ffmpegOpts = x))
