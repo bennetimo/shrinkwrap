@@ -84,14 +84,10 @@ class GoProHero5() extends StandardAudioVideo {
   override def name: String = "gopro5"
 
   override def ffmpegOptionsBase = ListMap(
-    "copy_unknown" -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
-    "map_metadata" -> "0", //copy over the global metadata from the first (only) input
-    "codec"        -> "copy", //for all streams, default to just copying as it with no transcoding
-    "preset"       -> "medium"
-  )
-
-  override val ffmpegOptionsVideo = super.ffmpegOptionsVideo ++ ListMap(
-    "pix_fmt"                            -> "yuvj420p",
+    "copy_unknown"                       -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
+    "map_metadata"                       -> "0", //copy over the global metadata from the first (only) input
+    "codec"                              -> "copy", //for all streams, default to just copying as it with no transcoding
+    "preset"                             -> "medium",
     "map 0:v"                            -> "",
     "map 0:a"                            -> "",
     "map 0:m:handler_name:'\tGoPro TCD'" -> "",
@@ -105,4 +101,10 @@ class GoProHero5() extends StandardAudioVideo {
     "metadata:s:d:1"                     -> "handler='\tGoPro MET'",
     "metadata:s:d:2"                     -> "handler='\tGoPro SOS (original fdsc stream)'"
   )
+
+  override val ffmpegOptionsVideo = super.ffmpegOptionsVideo ++ ListMap(
+    "pix_fmt" -> "yuvj420p"
+  )
+
+  override val ffmpegOptionsAudio = ListMap()
 }
