@@ -8,25 +8,27 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-feature")
 
 enablePlugins(DockerPlugin)
 
-lazy val shrinkwrap = (project in file(".")).
-  enablePlugins(BuildInfoPlugin).
-  settings(
+lazy val shrinkwrap = (project in file("."))
+  .enablePlugins(BuildInfoPlugin)
+  .settings(
     name := "shrinkwrap",
     version := "0.1.0",
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "build",
     scalafmtOnCompile := true,
-
-    libraryDependencies += "com.github.scopt" %% "scopt" % "3.7.0",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
-    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
-    
+    libraryDependencies += "com.github.scopt"           %% "scopt"          % "3.7.0",
+    libraryDependencies += "ch.qos.logback"             % "logback-classic" % "1.2.3",
+    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging"  % "3.9.0",
+    libraryDependencies += "org.scalactic"              %% "scalactic"      % "3.0.5",
+    libraryDependencies += "org.scalatest"              %% "scalatest"      % "3.0.5" % "test",
+    libraryDependencies += "org.scalacheck"             %% "scalacheck"     % "1.14.0" % "test",
+    libraryDependencies += "org.mockito"                %% "mockito-scala"  % "1.0.0" % Test,
     assemblyJarName in assembly := s"shrinkwrap-${version.value}.jar",
     dockerfile in docker := {
-      val artifact: File = assembly.value
+      val artifact: File     = assembly.value
       val artifactTargetPath = s"/app/${artifact.name}"
 
-      val dockerDir = target.value / "docker"
+      val dockerDir  = target.value / "docker"
       val projectDir = project.base.getAbsolutePath
 
       val dockerFile = new Dockerfile {
@@ -46,7 +48,6 @@ lazy val shrinkwrap = (project in file(".")).
         repository = name.value,
         tag = Some("latest")
       ),
-
       // Sets a name with a tag that contains the project version
       ImageName(
         namespace = Some("bennetimo"),
@@ -54,4 +55,4 @@ lazy val shrinkwrap = (project in file(".")).
         tag = Some(version.value)
       )
     )
-)
+  )

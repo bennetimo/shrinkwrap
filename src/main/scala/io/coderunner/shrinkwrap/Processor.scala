@@ -32,11 +32,15 @@ class Processor(config: Config) {
 
   def processFile(file: File): Unit = {
     ShrinkWrapFile(file, config) match {
-      case sf if sf.isTranscoded && !config.overwriteExistingTranscodes => {
+      case sf if sf.hasBeenTranscoded && !config.overwriteExistingTranscodes => {
         logger.debug(s"Skipping file: ${file.getAbsolutePath} (already transcoded)")
         filesSkippedAlreadyTranscoded += 1
       }
-      case sf if sf.ext != config.inputExtension => {
+      case sf if !sf.isOriginal => {
+        logger.debug(s"Skipping file: ${file.getAbsolutePath} (is a transcoded file)")
+        filesSkippedAlreadyTranscoded += 1
+      }
+      case sf if sf.extension != config.inputExtension => {
         logger.debug(s"Skipping file: ${file.getAbsolutePath} (ignored input extension)")
         filesSkippedInputExtension += 1
       }

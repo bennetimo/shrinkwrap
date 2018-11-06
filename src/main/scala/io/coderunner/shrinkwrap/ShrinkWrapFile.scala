@@ -7,13 +7,22 @@ case class ShrinkWrapFile(file: File, config: Config) {
   val transcodeSuffix = config.transcodeSuffix
   val outputExtension = config.outputExtension
 
-  def isTranscoded: Boolean = {
-    //File is transcoded if it has the suffix in it's name (it is the transcode), or
-    //if the transcoded version of it exists as a file in the same directory.
-    file.getName.contains(config.transcodeSuffix) || transcodedFile.exists()
-  }
+  /**
+    * Whether the file is an original or transcoded file (determined by checking for the transcode suffix)
+    * @return trie of the file is an original, non transcode
+    */
+  def isOriginal: Boolean = !file.getName.stripSuffix("." + extension).endsWith(config.transcodeSuffix)
 
-  def ext: String = path.substring(path.lastIndexOf(".") + 1)
+  /**
+    * Whether this particular file has an transcoded version of it available in the same dir
+    * @return true if the file has a transcode
+    */
+  def hasBeenTranscoded: Boolean = transcodedFile.exists()
+
+  def extension: String = {
+    val lastDot = path.lastIndexOf(".")
+    if (lastDot != -1) path.substring(lastDot + 1) else ""
+  }
 
   def transcodedFile: File =
     new File(s"${path.take(path.lastIndexOf("."))}${transcodeSuffix}.${outputExtension}")
