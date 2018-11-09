@@ -1,5 +1,7 @@
 package io.coderunner.shrinkwrap
 
+import java.io.File
+
 import Checks._
 
 class Processor(config: Config, actions: Seq[Action]) extends Logging {
@@ -17,10 +19,16 @@ class Processor(config: Config, actions: Seq[Action]) extends Logging {
     stats.bytesSaved += (sf.file.length() - sf.transcodedFile.length())
   }
 
+  def findAllFilesInDir(dir: File): Seq[File] = {
+    val (dirs, files) = dir.listFiles.filter(_.exists()).partition(_.isDirectory)
+
+    files ++ dirs.flatMap(findAllFilesInDir)
+  }
+
   def analyzeFiles(): (Stats, List[Skip]) = {
     val (dirs, files) = config.files.filter(_.exists()).partition(_.isDirectory)
     // Add files found in all the directories with the ones explicitly listed on the command line
-    val allFiles = (dirs.flatMap(_.listFiles) ++ files).map(ShrinkWrapFile(_, config))
+    val allFiles = (dirs.flatMap(findAllFilesInDir) ++ files).map(ShrinkWrapFile(_, config))
 
     // Filter the files to determine for each whether to process or skip it
     val checkedFiles = allFiles.map(sf =>
