@@ -84,22 +84,22 @@ class GoProHero5() extends StandardAudioVideo {
   override def name: String = "gopro5"
 
   override def ffmpegOptionsBase = ListMap(
-    "copy_unknown"                       -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
-    "map_metadata"                       -> "0", //copy over the global metadata from the first (only) input
-    "codec"                              -> "copy", //for all streams, default to just copying as it with no transcoding
-    "preset"                             -> "medium",
-    "map 0:v"                            -> "",
-    "map 0:a"                            -> "",
-    "map 0:m:handler_name:'\tGoPro TCD'" -> "",
-    "map 0:m:handler_name:'\tGoPro MET'" -> "",
-    "map 0:m:handler_name:'\tGoPro SOS'" -> "",
-    "tag:d:1"                            -> "'gpmd'",
-    "tag:d:2"                            -> "'gpmd'",
-    "metadata:s:v:"                      -> "handler='\tGoPro AVC'",
-    "metadata:s:a:"                      -> "handler='\tGoPro AAC'",
-    "metadata:s:d:0"                     -> "handler='\tGoPro TCD'",
-    "metadata:s:d:1"                     -> "handler='\tGoPro MET'",
-    "metadata:s:d:2"                     -> "handler='\tGoPro SOS (original fdsc stream)'"
+    "copy_unknown"                        -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
+    "map_metadata"                        -> "0", //copy over the global metadata from the first (only) input
+    "codec"                               -> "copy", //for all streams, default to just copying as it with no transcoding
+    "preset"                              -> "medium",
+    "map 0:v"                             -> "",
+    "map 0:a"                             -> "",
+    "map 0:m:handler_name:'\tGoPro TCD'?" -> "",
+    "map 0:m:handler_name:'\tGoPro MET'"  -> "",
+    "map 0:m:handler_name:'\tGoPro SOS'"  -> "",
+    "tag:d:1"                             -> "'gpmd'",
+    "tag:d:2"                             -> "'gpmd'",
+    "metadata:s:v:"                       -> "handler='\tGoPro AVC'",
+    "metadata:s:a:"                       -> "handler='\tGoPro AAC'",
+    "metadata:s:d:0"                      -> "handler='\tGoPro TCD'",
+    "metadata:s:d:1"                      -> "handler='\tGoPro MET'",
+    "metadata:s:d:2"                      -> "handler='\tGoPro SOS (original fdsc stream)'"
   )
 
   override val ffmpegOptionsVideo = super.ffmpegOptionsVideo ++ ListMap(
