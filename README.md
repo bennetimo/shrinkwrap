@@ -34,8 +34,12 @@ docker run -v /path/to/your/files:/files bennetimo/shrinkwrap \
 
 Where:
  
- * `/path/to/your/files` is a directory, or single file of what you would like to shrink
+ * `/path/to/your/files` is a directory containing the files you would like to shrink.
  * `--input-extension mp4` is the type of files to consider (anything else will be ignored)
+ 
+> It's also possible to shrink a single file instead of a directory. To do that, just change the last `/files`
+above to `/files/yourfile.mp4`, to get something like:
+ `docker run -v /path/to/your/files:/files bennetimo/shrinkwrap --input-extension mp4 /files/yourfile.mp4`
  
 Running this command will fire up shrinkwrap and set it to work on the files you specified. 
 
