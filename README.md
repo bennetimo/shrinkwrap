@@ -95,7 +95,7 @@ docker run -v /path/to/your/files:/files bennetimo/shrinkwrap:latest \
 
 ## Presets
 
-There are 3 presets available (submit a PR to add more if you want). Each preset is basically a collection
+There are 4 presets available (submit a PR to add more if you want). Each preset is basically a collection
 of options to pass to ffmpeg. There is a huge and extensive [documentation](https://www.ffmpeg.org/ffmpeg.html)
 of all the configuration you can do, so if you're not familiar with ffmpeg that's a good place to start.
  
@@ -160,6 +160,9 @@ See [here](https://www.reddit.com/r/ffmpeg/comments/8qosoj/merging_raw_gpmd_as_m
 "metadata:s:d:2"                     -> "handler='\tGoPro SOS (original fdsc stream)'"
 ```
  
+#### gopro7
+
+Same as gopro5 but takes into account stream name changes. 
 
 ## Dependencies
 

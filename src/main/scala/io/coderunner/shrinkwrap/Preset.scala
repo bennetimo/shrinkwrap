@@ -10,6 +10,7 @@ object Preset {
     case "standard" => new StandardAudioVideo()
     case "gopro4"   => new GoProHero4()
     case "gopro5"   => new GoProHero5()
+    case "gopro7"   => new GoProHero7()
     case _          => new StandardAudioVideo()
   }
 }
@@ -91,7 +92,7 @@ class GoProHero5() extends StandardAudioVideo {
     "map 0:v"                             -> "",
     "map 0:a"                             -> "",
     "map 0:m:handler_name:'\tGoPro TCD'?" -> "",
-    "map 0:m:handler_name:'\tGoPro MET'"  -> "",
+    "map 0:m:handler_name:'\tGoPro MET'?" -> "",
     "map 0:m:handler_name:'\tGoPro SOS'"  -> "",
     "tag:d:1"                             -> "'gpmd'",
     "tag:d:2"                             -> "'gpmd'",
@@ -107,4 +108,33 @@ class GoProHero5() extends StandardAudioVideo {
   )
 
   override val ffmpegOptionsAudio = ListMap()
+}
+
+// Same as GoProHero5 but don't use tabs in the stream names
+class GoProHero7() extends GoProHero5 {
+
+  override def name: String = "gopro7"
+
+  // Hero7 seems to use a vertical tab before the stream name, and two spaces after...!
+  private val verticalTab: Char = '\u000b'
+
+  override def ffmpegOptionsBase = ListMap(
+    "copy_unknown"                                       -> "", //if there are streams ffmpeg doesn't know about, still copy them (e.g some GoPro data stuff)
+    "map_metadata"                                       -> "0", //copy over the global metadata from the first (only) input
+    "codec"                                              -> "copy", //for all streams, default to just copying as it with no transcoding
+    "preset"                                             -> "medium",
+    "map 0:v"                                            -> "",
+    "map 0:a"                                            -> "",
+    s"map 0:m:handler_name:'${verticalTab}GoPro TCD  '"  -> "",
+    s"map 0:m:handler_name:'${verticalTab}GoPro SOS  '"  -> "",
+    s"map 0:m:handler_name:'${verticalTab}GoPro MET  '?" -> "",
+    "tag:d:1"                                            -> "'gpmd'",
+    "tag:d:2"                                            -> "'gpmd'",
+    "metadata:s:v:"                                      -> "handler='GoPro AVC'",
+    "metadata:s:a:"                                      -> "handler='GoPro AAC'",
+    "metadata:s:d:0"                                     -> "handler='GoPro TCD '",
+    "metadata:s:d:2"                                     -> "handler='GoPro SOS (original fdsc stream)'",
+    "metadata:s:d:1"                                     -> "handler='GoPro MET'"
+  )
+
 }
