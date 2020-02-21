@@ -79,7 +79,7 @@ You can specify different options to control how and what is transcoded:
 | -o | --output-extension | mp4 | output file format (e.g. mp4, aac) |
 | -a | --audio | true | whether to transcode audio or copy |
 | -v | --video | true | whether to transcode video or copy |
-| -p | --preset | standard | preset to use (standard, gopro4, gopro5) |
+| -p | --preset | standard | preset to use (standard, gopro4, gopro5, gopro7) |
 | -b | --backup-metadata | false | whether to dump each original files metadata to a text file |
 | -s | --transcode-suffix | -tc | suffix used to identify a transcoded file |
 | -f | --force-overwrite | false | if true, will retranscode already transcoded files |
