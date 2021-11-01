@@ -83,7 +83,7 @@ You can specify different options to control how and what is transcoded:
 | -b | --backup-metadata | false | whether to dump each original files metadata to a text file |
 | -s | --transcode-suffix | -tc | suffix used to identify a transcoded file |
 | -f | --force-overwrite | false | if true, will retranscode already transcoded files |
-| N/A | --fmpeg-opts k1=v1,k2=v2 | N/A | Arbitrary ffmpeg options to add for the transcode |
+| N/A | --ffmpeg-opts k1=v1,k2=v2 | N/A | Arbitrary ffmpeg options to add for the transcode |
 
 For example, if you wanted to transcode GoPro Hero5 video files at an ffmpeg
 crf quality setting of 20 using the speed preset veryfast, you might use something like:
