@@ -11,7 +11,7 @@ object Preset {
     case "gopro4"   => new GoProHero4()
     case "gopro5"   => new GoProHero5()
     case "gopro7"   => new GoProHero7()
-	case "gopro10"  => new GoProHero10()
+    case "gopro10"  => new GoProHero10()
     case _          => new StandardAudioVideo()
   }
 }
