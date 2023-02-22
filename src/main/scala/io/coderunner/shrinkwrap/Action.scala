@@ -36,7 +36,7 @@ case class ShrinkAction() extends Action {
 // Uses exiftool to copy file modification data from the original file to the transcode
 case class RecoverFileMetadata() extends Action {
   override def action(sf: ShrinkWrapFile, config: Config): String = {
-    raw"""exiftool -tagsfromfile "${sf.file.getAbsolutePath}" -extractEmbedded -all:all \
+    raw"""exiftool -tagsfromfile "${sf.file.getAbsolutePath}" -extractEmbedded "-all:all>all:all" \
        -"*gps*" -time:all --FileAccessDate --FileInodeChangeDate -FileModifyDate \
        -ext ${config.outputExtension} -overwrite_original "${sf.transcodedFile.getAbsolutePath}""""
   }
